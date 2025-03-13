@@ -4,12 +4,10 @@ import datetime
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-# from email.MIMEMultipart import MIMEMultipart
-#from email.MIMEText import MIMEText
 
 msg = MIMEMultipart()
-msg['From'] = 'jvillegas@sonic.net'
-msg['To'] = 'jvillegas@sonic.net'
+msg['From'] = 'SONIC_EMAIL_ADDRESS'
+msg['To'] = 'SONIC_EMAIL_ADDRESS'
 msg['Subject'] = 'VPN Down '+datetime.datetime.now().strftime('%m/%d %H:%M')
 message = 'VPN is DOWN'
 msg.attach(MIMEText(message))
@@ -21,8 +19,8 @@ mailserver.ehlo()
 mailserver.starttls()
 # re-identify ourselves as an encrypted connection
 mailserver.ehlo()
-mailserver.login('jvillegas@sonic.net', '4Mexico420$!')
+mailserver.login('SONIC_EMAIL_ADDRESS', 'SONIC_EMAIL_PASSWORD')
 
-mailserver.sendmail('jvillegas@sonic.net','jvillegas@sonic.net',msg.as_string())
+mailserver.sendmail('SONIC_EMAIL_ADDRESS','SONIC_EMAIL_ADDRESS',msg.as_string())
 
 mailserver.quit()

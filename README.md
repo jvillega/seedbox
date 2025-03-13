@@ -6,48 +6,35 @@ I used a couple of guides to help come up with this.
 [https://trash-guides.info/File-and-Folder-Structure/](https://trash-guides.info/File-and-Folder-Structure/)
 
 ### Useful commands
-You need to make all .sh files executable. Use the below command on each file:
+You need to make all .sh files executable. Use the below command on each file, if you want to change permissions you can change the number::
 ```
 chmod 755 FILE
 ```
 This will give owner read, write execute and everyone else read and execute.
 
-## TrueNAS
-We need to mount the SMB share from TrueNAS.
-
-Create a directory in your home directory to mount the SMB share. I used data as the diretory.
-
-#### Relevant Files:
-**.smbcrendentials** - update SMB_USER and SMB_USER_PASSWORD in this file to your SMB share user and password. This file allows us to auto mount the share on computer startup.
-
-In the below commands replace SMB_USERNAME with your SMB share user, SMB_USER_APSSWORD with your SMB share user password, HOSTNAME with the IP of TrueNAS, SHARE with the name of the share and PATH_TO_MOUNT_DIR with the directory of where you want to mount the SMB share, PATH_TO_CREDENTIALS_FILE with the absolute path to the .smbcrendentials file, USER_ID with your uid, GROUP_ID with your gid.
-If you are not sure what your uid and gid are you can run:
+Use the below command to get your UID and GID which you will need later. It will probably be 1000.
 ```
 id
 ```
 
-You can unmount the SMB share with:
-```
-sudo umount PATH_TO_MOUNT_DIR
-```
+## TrueNAS
+We need to mount the NFS share from TrueNAS. This share should be owned by the same name, UID, GID as your linux user. This has instructions that worked for me [https://trash-guides.info/File-and-Folder-Structure/How-to-set-up/TrueNAS-Core/](https://trash-guides.info/File-and-Folder-Structure/How-to-set-up/TrueNAS-Core/). It is technically for TrueNAS Core but it should work. You don't need a shared group.
 
-You can use the below command to test mounting the SMB share. Once mounted check the directory then unmount:
-```
-sudo mount -t cifs -o vers=3.0,username=SMB_USERNAME,password=SMB_USER_PASSWORD //HOSTNAME/SHARE PATH_TO_MOUNT_DIR/
-```
+Create a directory in your home directory to mount the NFS share. I used data as the diretory.
 
-You can use the below command to test mounting the SMB share using the .smbcredentials file. Once mounted check the directory then unmount:
+You can use the below command to mount the NFS share
 ```
-sudo mount -t cifs -o vers=3.0,credentials=PATH_TO_CREDENTIALS_FILE //HOSTNAME/SHARE PATH_TO_MOUNT_DIR/
+sudo mount -t nfs TRUENAS_IP:PATH_TO_NFS_SHARE MOUNT_PATH
 ```
+For me the PATH_TO_NFS_SHARE needed to be an absolute path.
 
-Once those commands work add this to your /etc/fstab file.
+To mount the NFS share on restat or start up use:
 ```
-//HOSTNAME/SHARE    PATH_TO_MOUNT_DIR   cifs    x-systemd.automount,noserverino,noauto,vers=3.0,credentials=PATH_TO_CREDENTIALS_FILE,iocharset=utf9,sec=ntlmv2,dir_mode=0775,uid=USER_ID,gid=GROUD_ID   0   0
+sudo echo "TRUENAS_IP:/PATH_TO_NFS_SHARE MOUNT_PATH nfs" >> /etc/fstab
 ```
 
 ## File Structure
-Once the SMB share is mounted you need to create the file structure for everything. Here is the file structure, you can add more directories such as books, music. I'm only downloading movies and tv:
+Once the NFS share is mounted you need to create the file structure for everything. Here is the file structure, you can add more directories such as books, music. I'm only downloading movies and tv:
 MOUNT_DIR
     torrents
         movies
@@ -62,8 +49,7 @@ MOUNT_DIR
         tv
 
 ## Docker
-We are going to install rootless docker so we can stop containers without having to use sudo. This makes it sigfincantly easier to do it in a cronjob. Instructions can be found at:
-[https://docs.docker.com/engine/security/rootles](shttps://docs.docker.com/engine/security/rootless)
+We are going to install docker. You can find instructions at [https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/). If you are using Debian 12 you can just run install-docker.sh.
 
 We are going to need one more directory for container configs. I used config as the directory name in my home directory. Each container is going to need its' own directory in the config directory. You should have something similar to:
 config
@@ -73,7 +59,7 @@ config
     bazarr
     sabnzbd
 
-In the repository there should be a file titled docker.sh. This file containes all the docker run commands but I'll include the commands below in case you want run them run at a time or examine them. I'm assuming you are using data to save all the torrent stuff and config for the container configurations. If you are not you will need to update PATH_TO_CONFIG and PATH_TO_DATA. Replace UID and GID with your uid and gid which you should already have. I have no idea how to use these programs or even what they do other then deluge.
+In the repository there should be a file titled docker.sh. This file containes all the docker run commands but I'll include the commands below in case you want to run them one at a time or examine them. I'm assuming you are using data to save all the torrent stuff and config for the container configurations. If you are not you will need to update PATH_TO_CONFIG and PATH_TO_DATA. Replace UID and GID with your uid and gid which you should already have. I have no idea how to use these programs or even what they do other then deluge.
 ```
 # Radarr
 docker run --detach --restart unless-stopped --publish 7878:7878 --name radarr -v PATH_TO_CONFIG/radarr:/config -v PATH_TO_DATA/data:/data -e PUID=UID -e PGID=GID ghcr.io/hotio/radarr:latest
@@ -94,23 +80,29 @@ If you want more info on the options in the commands check out [Docker's docs](h
 
 You can check if the containers are running with:
 ```
-docker ps
+sudo docker ps
 ```
 
-You can now access any of the containers from another computer via web gui at IP_ADDR:PORTOFCONATINER
+You can now access any of the containers from another computer via web gui at IP_ADDR:PORT-OF-CONATINER
+
+I've included some other useful files. You may not need them but I was constantly using them:
+**stop-docker-containers.sh** stops all the containers. Add/remove based on the containers you are using.
+**start-docker-containers.sh** start all containers. Add/remove based on the containers you are using.
+**restart-docker-containers** restart all containers. Add/remove based on the containers you are using.
+**prune-docker.sh** delete and remove all stopped containers. Be careful using this.
 
 ## Cronjob
-We will create a cronjob to periodically check for a VPN connection. If no connection stop the containers and email about VPN being down. Ideally we would also clear the ip route table, restart the vpn, then start the containers once the VPN is connected. I could figure out how to do that. My biggest issue was running commands without having to enter in the sudo password.
+We will create a cronjob to periodically check for a VPN connection. If no connection stop the containers and email about VPN being down. If VPN is down stop all cotainers and flush the ip route cache. If you don't flush the ip route cache the internet will stop working. If the VPN is up and containers are stopped start containers. 
 
 To add a cronjob run:
 ```
-crontab -e
+sudo crontab -e
 ```
 It will ask which editor to use. Nano is the easiest to use.
 
 Add this to the end of the file:
 ```
-* * * * * PATH_TO_VPN_CRONJOB.SH
+* * * * * PATH/sudo_vpn_cronjob.sh
 ```
 
 ## VPN
@@ -121,10 +113,9 @@ Relevant files:
 **vpn-crendentials.txt** - update this file with your vpn username and password. This will allow us to auto login to the vpn.
 **user_filter/vpn_base.sh** - In this file update NETIF with your network interface (ex: eth0, ens18). Run ip addr and look for the interface grabbing the local IP. Update VPNUSER with the name of your linux user.
 
-To start the vpn run the below command.
+To start the vpn run the below command. Starting the VPN is going to take over your console. I'd suggest running it in the proxmox console. You can also run it in the background by hitting CTRL+Z then running the command bg. You will may need to stop the process later. I'm using the first option.
 ```
-PATH_TO_DELUGE-VPN-SCRIPT/deluge_vpn.sh
-or if you are in deluge-vpn-script
+cd deluge-vpn-script
 ./deluge_vpn.sh
 ```
 
@@ -139,4 +130,13 @@ sudo ip route flush table 42
 ```
 
 ## What to do when the VPN goes down
-Make sure docker containers are stopped. Start the VPN again following the VPN section. Then run start-docker-containers.sh to start all the containers. You are going to need to start the containers in another window so I recommend SSHing into the server form another computer.
+You just need to start the VPN again. The cornjob will take care of starting the containers again.
+
+## Connecting containers
+For connecting deluge with radarr or any other containers you are going to need the IP the docker bridge gives the deluge container. Run:
+```
+sudo docker inspect deluge
+```
+You are looking for IPAddress under bridge. It will probably be 172.17.0.*
+
+Info adding the NFS share with examples can be found at [https://trash-guides.info/File-and-Folder-Structure/Examples/](https://trash-guides.info/File-and-Folder-Structure/Examples/)
