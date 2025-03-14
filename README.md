@@ -151,4 +151,4 @@ sudo docker inspect deluge
 ```
 You are looking for IPAddress under bridge. It will probably be 172.17.0.*
 
-Info adding the NFS share with examples can be found at [https://trash-guides.info/File-and-Folder-Structure/Examples/](https://trash-guides.info/File-and-Folder-Structure/Examples/)
+Info adding the NFS share and other settings with examples can be found at [https://trash-guides.info/File-and-Folder-Structure/Examples/](https://trash-guides.info/File-and-Folder-Structure/Examples/). Just make sure you are updating paths.
