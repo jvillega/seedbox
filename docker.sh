@@ -1,13 +1,17 @@
 # Intructions for installing docker rootlesss
 # https://docs.docker.com/engine/security/rootless/
 
-# Once docker rootless is installed you could run this file as a bash scrips
-docker run --detach --restart unless-stopped --publish 7878:7878 --name radarr -v /home/seeder/config/radarr:/config -v /home/seeder/data/:/data -e PUID=1000 -e PGID=1000 -e UMASK=022 ghcr.io/hotio/radarr:latest
+# Radarr
+docker run --detach --restart unless-stopped --publish 7878:7878 --name radarr -v PATH_TO_CONFIG/radarr:/config -v PATH_TO_DATA/data:/data -e PUID=UID -e PGID=GID ghcr.io/hotio/radarr:latest
 
-docker run --detach --restart unless-stopped --publish 8989:8989 --name sonarr -v /home/seeder/config/sonarr:/config -v /home/seeder/data/:/data -e PUID=1000 -e PGID=1000 -e UMASK=022 ghcr.io/hotio/sonarr:latest
+# Sonarr
+docker run --detach --restart unless-stopped --publish 8989:8989 --name sonarr -v PATH_TO_CONFIG/sonarr:/config -v PATH_TO_DATA/data:/data -e PUID=UID -e PGID=GID ghcr.io/hotio/sonarr:latest
 
-docker run --detach --restart unless-stopped --publish 6767:6767 --name bazarr -v /home/seeder/config/bazarr:/config -v /home/seeder/data/:/data/media -e PUID=1000 -e PGID=1000 -e UMASK=022 ghcr.io/hotio/bazarr:latest
+# Bazarr
+docker run --detach --restart unless-stopped --publish 6767:6767 --name bazarr -v PATH_TO_CONFIG/bazarr:/config -v PATH_TO_DATA/data:/data/media -e PUID=UID -e PGID=GID ghcr.io/hotio/bazarr:latest
 
-docker run --detach --restart unless-stopped --publish 8080:8080 --publish 9090:9090 --name sabnzbd -v /home/seeder/config/sabnzbd:/config -v /home/seeder/data/usenet:/data/usenet -e PUID=1000 -e PGID=1000 -e UMASK=022 ghcr.io/hotio/sabnzbd:latest
+# Sabnzbd
+docker run --detach --restart unless-stopped --publish 8080:8080 --publish 9090:9090 --name sabnzbd -v PATH_TO_CONFIG/sabnzbd:/config -v PATH_TO_DATA/data/usenet:/data/usenet:rw -e PUID=UID -e PGID=GID ghcr.io/hotio/sabnzbd:latest
 
-docker run --detach --restart unless-stopped --publish 8112:8112 --name deluge -v /home/seeder/config/deluge:/config -v /home/seeder/data/torrents:/data/torrents -e PUID=1000 -e PGID=1000 -e UMASK=022 lscr.io/linuxserver/deluge:latest
+# Deluge
+docker run --detach --restart unless-stopped --publish 8112:8112 --name deluge -v PATH_TO_CONFIG/radarr:/config -v PATH_TO_DATA/data/torrents:/data/torrents -e PUID=UID -e PGID=GID lscr.io/linuxserver/deluge:latest
