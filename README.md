@@ -32,7 +32,7 @@ For me the PATH_TO_NFS_SHARE needed to be an absolute path.
 
 To mount the NFS share on restat or start add the following line to your /etc/fstab file. They are separated by tabs but spaces should work.
 ```
-TRUENAS_IP:/PATH_TO_NFS_SHARE  MOUNT_PATH   nfs 0   0   0
+TRUENAS_IP:/PATH_TO_NFS_SHARE  MOUNT_PATH   nfs noauto,x-systemc.automount  0   0
 ```
 
 ## File Structure
