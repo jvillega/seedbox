@@ -12,7 +12,7 @@ if [[ -z $tun_info ]] && [[ -n $deluge_info ]]; then
     
     ip route flush table 42
 
-    python3 /home/seeder/notify-vpn-down.py
+    python3 PATH/notify-vpn-down.py
 elif [[ -n $tun_info ]] && [[ -z $deluge_info ]]; then
     docker start deluge
     docker start sabnzbd
