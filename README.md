@@ -54,12 +54,12 @@ MOUNT_DIR
 We are going to install docker. You can find instructions at [https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/). If you are using Debian 12 you can just run install-docker.sh.
 
 We are going to need one more directory for container configs. I used config as the directory name in my home directory. Each container is going to need its' own directory in the config directory. You should have something similar to:
-config
-- deluge
-- sonarr
-- radarr
-- bazarr
-- sabnzbd
+- config
+    - deluge
+    - sonarr
+    - radarr
+    - bazarr
+    - sabnzbd
 
 In the repository there should be a file titled docker.sh. This file containes all the docker run commands but I'll include the commands below in case you want to run them one at a time or examine them. Repalce PATH_TO_CONFIG with the absolute path to your config directory, repalce PATH_TO_DATE with the absolute path to the data directory. If you named them something else use the absolute path to those.
 
