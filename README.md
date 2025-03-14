@@ -98,6 +98,8 @@ I've included some other useful files. You may not need them but I was constantl
 ## Cronjob
 We will create a cronjob to periodically check for a VPN connection. If no connection stop the containers and email about VPN being down. If VPN is down stop all cotainers and flush the ip route cache. If you don't flush the ip route cache the internet will stop working. If the VPN is up and containers are stopped start containers. This will run every minute so if you want to manually test that this script works set this up last.
 
+In sudo-vpn-cronjob.sh update PATH to the absolute path of notify-vpn-down.py.
+
 Update the info in notify-vpn-down.py with your sonic email address info. This python script handles the email notification when the vpn is down. Not best practice to save your password in plaintext.
 
 To add a cronjob run:
