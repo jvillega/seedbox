@@ -80,7 +80,7 @@ sudo docker run --detach --restart unless-stopped --publish 6767:6767 --name baz
 sudo docker run --detach --restart unless-stopped --publish 8080:8080 --publish 9090:9090 --name sabnzbd -v PATH_TO_CONFIG/sabnzbd:/config -v PATH_TO_DATA/usenet:/data/usenet:rw -e PUID=UID -e PGID=GID ghcr.io/hotio/sabnzbd:latest
 
 # Deluge
-sudo docker run --detach --restart unless-stopped --publish 8112:8112 --name deluge -v PATH_TO_CONFIG/radarr:/config -v PATH_TO_DATA/torrents:/data/torrents -e PUID=UID -e PGID=GID lscr.io/linuxserver/deluge:latest
+sudo docker run --detach --restart unless-stopped --publish 8112:8112 --name deluge -v PATH_TO_CONFIG/deluge:/config -v PATH_TO_DATA/torrents:/data/torrents -e PUID=UID -e PGID=GID lscr.io/linuxserver/deluge:latest
 
 # Prowlarr
 sudo docker run --detach --restart unless-stopped --publish 9696:9696 --name prowlarr -v PATH_TO_CONFIG/prowlarr:/config -v PATH_TO_DATA:/data -e PUID=UID -e PGID=GID ghcr.io/hotio/prowlarr:lastest
