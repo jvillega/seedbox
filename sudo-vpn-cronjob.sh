@@ -9,7 +9,8 @@ if [[ -z $tun_info ]] && [[ -n $deluge_info ]]; then
     docker stop bazarr
     docker stop sonarr
     docker stop radarr
-    
+    docker stop prowlarr
+    docker stop flaresolverr    
     ip route flush table 42
 
     python3 PATH/notify-vpn-down.py
@@ -19,4 +20,6 @@ elif [[ -n $tun_info ]] && [[ -z $deluge_info ]]; then
     docker start bazarr
     docker start sonarr
     docker start radarr
+    docker start prowlarr
+    docker start faresolverr
 fi
