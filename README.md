@@ -68,7 +68,7 @@ In the repository there should be a file titled docker.sh. This file containes a
 It would be best practice if each container had an individual user but I'm the only one accessing this so I'm not worried about the increased security.
 ```
 # This will create a network so we can assign a static IP to each container. If you don't containers might have a different IP which you will have to update in each container
-sudo docker network create --subnet=172.18.0.0/16 arrstack
+sudo docker network create --subnet=172.18.0.0/16 --gateway=172.18.0.1 arrstack
 
 # Radarr
 sudo docker run --detach --restart unless-stopped --network=arrstack --ip=172.18.0.2 --publish 7878:7878 --name radarr -v PATH_TO_CONFIG/radarr:/config -v PATH_TO_DATA:/data -e PUID=UID -e PGID=GID ghcr.io/hotio/radarr:latest
